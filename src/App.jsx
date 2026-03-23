@@ -14,12 +14,22 @@ export default function App() {
     setLoading(true);
     setResult("");
 
-    setTimeout(() => {
-      setResult(`Property: ${address}
-Estimated Cost: $220,000
-Status: Success`);
+    try {
+      const response = await fetch("https://hivesta-backend-1.onrender.com/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ address })
+      });
+
+      const text = await response.text();
+      setResult(text);
+    } catch (error) {
+      setResult("Error connecting to backend.");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
