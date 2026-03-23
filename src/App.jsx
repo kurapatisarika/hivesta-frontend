@@ -3,32 +3,47 @@ import React, { useState } from "react";
 export default function App() {
   const [address, setAddress] = useState("");
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!address) {
       alert("Please enter a property address");
       return;
     }
 
-    // Temporary mock result
-    setResult(`Analyzing: ${address}...\nEstimated Cost: $220,000`);
+    setLoading(true);
+    setResult("");
+
+    try {
+      const response = await fetch("https://hivesta-backend.onrender.com/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ address })
+      });
+
+      const data = await response.json();
+      setResult(JSON.stringify(data, null, 2));
+    } catch (error) {
+      setResult("Error connecting to backend.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0f172a",
-      color: "white",
-      padding: "40px",
-      fontFamily: "Arial"
-    }}>
-      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>
-        Hivesta Takeoff Pro
-      </h1>
-
-      <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
-        AI Construction Estimator
-      </p>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0f172a",
+        color: "white",
+        padding: "40px",
+        fontFamily: "Arial"
+      }}
+    >
+      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>Hivesta Takeoff Pro</h1>
+      <p style={{ color: "#94a3b8", marginBottom: "30px" }}>AI Construction Estimator</p>
 
       <input
         type="text"
@@ -46,6 +61,7 @@ export default function App() {
 
       <button
         onClick={handleAnalyze}
+        disabled={loading}
         style={{
           padding: "12px 20px",
           background: "#2563eb",
@@ -55,19 +71,21 @@ export default function App() {
           cursor: "pointer"
         }}
       >
-        Analyze
+        {loading ? "Analyzing..." : "Analyze"}
       </button>
 
       {result && (
-        <div style={{
-          marginTop: "30px",
-          background: "#1e293b",
-          padding: "20px",
-          borderRadius: "8px",
-          whiteSpace: "pre-line"
-        }}>
+        <pre
+          style={{
+            marginTop: "30px",
+            background: "#1e293b",
+            padding: "20px",
+            borderRadius: "8px",
+            whiteSpace: "pre-wrap"
+          }}
+        >
           {result}
-        </div>
+        </pre>
       )}
     </div>
   );
