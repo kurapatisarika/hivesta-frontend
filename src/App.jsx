@@ -6,7 +6,6 @@ const T = {
   panelDark: "#0f172a",
   border: "rgba(148,163,184,0.18)",
   blue: "#2563eb",
-  blue2: "#3b82f6",
   text: "#ffffff",
   textDim: "#cbd5e1",
   textMuted: "#94a3b8",
@@ -38,8 +37,8 @@ export default function App() {
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
-      alert("Please upload a PDF smaller than 15 MB.");
+    if (file.size > 30 * 1024 * 1024) {
+      alert("Please upload a PDF smaller than 30 MB.");
       return;
     }
 
@@ -56,7 +55,7 @@ export default function App() {
         },
         body: JSON.stringify({
           fileName: file.name,
-          pdfBase64: pdfBase64
+          pdfBase64
         })
       });
 
@@ -74,6 +73,7 @@ export default function App() {
   const area = result?.area_tabulation || {};
   const rooms = Array.isArray(result?.rooms) ? result.rooms : [];
   const windowsDoors = Array.isArray(result?.windows_doors) ? result.windows_doors : [];
+  const garageDoors = Array.isArray(result?.garage_doors) ? result.garage_doors : [];
   const plumbing = Array.isArray(result?.plumbing) ? result.plumbing : [];
   const electrical = Array.isArray(result?.electrical) ? result.electrical : [];
   const flooring = result?.flooring || {};
@@ -87,6 +87,8 @@ export default function App() {
   const totalDoors = windowsDoors
     .filter((x) => x.type !== "window")
     .reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
+
+  const totalGarageDoors = garageDoors.reduce((sum, x) => sum + (Number(x.qty) || 0), 0);
 
   return (
     <div
@@ -112,24 +114,11 @@ export default function App() {
             HIVESTA CONSTRUCTION
           </div>
 
-          <h1
-            style={{
-              fontSize: "40px",
-              margin: "0 0 10px 0",
-              fontWeight: "700"
-            }}
-          >
+          <h1 style={{ fontSize: "40px", margin: "0 0 10px 0", fontWeight: "700" }}>
             Hivesta Takeoff Pro
           </h1>
 
-          <p
-            style={{
-              margin: 0,
-              color: T.textDim,
-              fontSize: "18px",
-              lineHeight: "1.6"
-            }}
-          >
+          <p style={{ margin: 0, color: T.textDim, fontSize: "18px", lineHeight: "1.6" }}>
             Upload your construction plans and get an AI-ready takeoff workflow.
           </p>
         </div>
@@ -221,8 +210,7 @@ export default function App() {
                 borderRadius: "12px",
                 fontSize: "17px",
                 fontWeight: "600",
-                cursor: loading ? "not-allowed" : "pointer",
-                boxShadow: loading ? "none" : "0 8px 20px rgba(37, 99, 235, 0.35)"
+                cursor: loading ? "not-allowed" : "pointer"
               }}
             >
               {loading ? "Analyzing Plan..." : "Analyze Plan"}
@@ -280,7 +268,7 @@ export default function App() {
                   Processing your plan...
                 </div>
                 <div style={{ color: T.textMuted }}>
-                  Reading PDF, extracting rooms, openings, MEP fixtures, flooring, drywall, and foundation data.
+                  Reading PDF, extracting rooms, openings, flooring, and foundation data.
                 </div>
               </div>
             )}
@@ -335,9 +323,10 @@ export default function App() {
                 </div>
 
                 <Section title="Openings Summary">
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
                     <StatCard label="Windows" value={fmt(totalWindows)} />
-                    <StatCard label="Doors / Sliders / Garage" value={fmt(totalDoors)} />
+                    <StatCard label="Doors / Sliders" value={fmt(totalDoors)} />
+                    <StatCard label="Garage Doors" value={fmt(totalGarageDoors)} />
                   </div>
                 </Section>
 
@@ -366,12 +355,13 @@ export default function App() {
           <div style={{ marginTop: "24px", display: "grid", gap: "18px" }}>
             <Section title="Rooms">
               <SimpleTable
-                columns={["Room", "Length", "Width", "Interior SF", "Category", "Ref"]}
+                columns={["Room", "Length", "Width", "Interior SF", "SF Source", "Category", "Ref"]}
                 rows={rooms.map((r) => [
                   r.name || "--",
                   r.length || "--",
                   r.width || "--",
                   fmt(r.sqft_interior),
+                  r.sqft_source || "--",
                   r.category || "--",
                   r.ref || "--"
                 ])}
@@ -387,6 +377,19 @@ export default function App() {
                   r.location || "--",
                   fmt(r.qty),
                   r.type || "--",
+                  r.ref || "--"
+                ])}
+              />
+            </Section>
+
+            <Section title="Garage Doors">
+              <SimpleTable
+                columns={["Item", "Size", "Location", "Qty", "Ref"]}
+                rows={garageDoors.map((r) => [
+                  r.item || "--",
+                  r.size || "--",
+                  r.location || "--",
+                  fmt(r.qty),
                   r.ref || "--"
                 ])}
               />
@@ -418,11 +421,12 @@ export default function App() {
 
             <Section title="Flooring Details">
               <SimpleTable
-                columns={["Area", "Type", "SF", "Ref"]}
+                columns={["Area", "Type", "SF", "Source", "Ref"]}
                 rows={(Array.isArray(flooring.details) ? flooring.details : []).map((r) => [
                   r.area || "--",
                   r.type || "--",
                   fmt(r.sqft),
+                  r.source || "--",
                   r.ref || "--"
                 ])}
               />
