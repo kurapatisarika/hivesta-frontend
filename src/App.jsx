@@ -1,10 +1,74 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function App() {
+  const [address, setAddress] = useState("");
+  const [result, setResult] = useState("");
+
+  const handleAnalyze = () => {
+    if (!address) {
+      alert("Please enter a property address");
+      return;
+    }
+
+    // Temporary mock result
+    setResult(`Analyzing: ${address}...\nEstimated Cost: $220,000`);
+  };
+
   return (
-    <div style={{ color: "white", padding: "40px" }}>
-      <h1>Hivesta Takeoff Pro</h1>
-      <p>Welcome to your AI construction estimator</p>
+    <div style={{
+      minHeight: "100vh",
+      background: "#0f172a",
+      color: "white",
+      padding: "40px",
+      fontFamily: "Arial"
+    }}>
+      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>
+        Hivesta Takeoff Pro
+      </h1>
+
+      <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
+        AI Construction Estimator
+      </p>
+
+      <input
+        type="text"
+        placeholder="Enter property address..."
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        style={{
+          padding: "12px",
+          width: "300px",
+          marginRight: "10px",
+          borderRadius: "6px",
+          border: "none"
+        }}
+      />
+
+      <button
+        onClick={handleAnalyze}
+        style={{
+          padding: "12px 20px",
+          background: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: "6px",
+          cursor: "pointer"
+        }}
+      >
+        Analyze
+      </button>
+
+      {result && (
+        <div style={{
+          marginTop: "30px",
+          background: "#1e293b",
+          padding: "20px",
+          borderRadius: "8px",
+          whiteSpace: "pre-line"
+        }}>
+          {result}
+        </div>
+      )}
     </div>
   );
 }
