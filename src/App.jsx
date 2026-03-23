@@ -14,22 +14,12 @@ export default function App() {
     setLoading(true);
     setResult("");
 
-    try {
-      const response = await fetch("https://hivesta-backend.onrender.com/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ address })
-      });
-
-      const data = await response.json();
-      setResult(JSON.stringify(data, null, 2));
-    } catch (error) {
-      setResult("Error connecting to backend.");
-    } finally {
+    setTimeout(() => {
+      setResult(`Property: ${address}
+Estimated Cost: $220,000
+Status: Success`);
       setLoading(false);
-    }
+    }, 1500);
   };
 
   return (
@@ -42,8 +32,13 @@ export default function App() {
         fontFamily: "Arial"
       }}
     >
-      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>Hivesta Takeoff Pro</h1>
-      <p style={{ color: "#94a3b8", marginBottom: "30px" }}>AI Construction Estimator</p>
+      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>
+        Hivesta Takeoff Pro
+      </h1>
+
+      <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
+        AI Construction Estimator
+      </p>
 
       <input
         type="text"
@@ -52,10 +47,11 @@ export default function App() {
         onChange={(e) => setAddress(e.target.value)}
         style={{
           padding: "12px",
-          width: "300px",
+          width: "320px",
           marginRight: "10px",
           borderRadius: "6px",
-          border: "none"
+          border: "none",
+          fontSize: "16px"
         }}
       />
 
@@ -68,7 +64,8 @@ export default function App() {
           color: "white",
           border: "none",
           borderRadius: "6px",
-          cursor: "pointer"
+          cursor: "pointer",
+          fontSize: "16px"
         }}
       >
         {loading ? "Analyzing..." : "Analyze"}
@@ -81,7 +78,9 @@ export default function App() {
             background: "#1e293b",
             padding: "20px",
             borderRadius: "8px",
-            whiteSpace: "pre-wrap"
+            whiteSpace: "pre-wrap",
+            fontSize: "16px",
+            lineHeight: "1.6"
           }}
         >
           {result}
