@@ -77,6 +77,7 @@ export default function App() {
   const plumbing = Array.isArray(result?.plumbing) ? result.plumbing : [];
   const electrical = Array.isArray(result?.electrical) ? result.electrical : [];
   const flooring = result?.flooring || {};
+  const bathrooms = Array.isArray(result?.bathrooms) ? result.bathrooms : [];
   const foundation = result?.foundation || {};
   const foundationStages = Array.isArray(foundation?.stages) ? foundation.stages : [];
 
@@ -268,7 +269,7 @@ export default function App() {
                   Processing your plan...
                 </div>
                 <div style={{ color: T.textMuted }}>
-                  Reading PDF, extracting rooms, openings, flooring, and foundation data.
+                  Reading PDF, extracting rooms, openings, bathroom takeoff, flooring, and foundation data.
                 </div>
               </div>
             )}
@@ -319,7 +320,7 @@ export default function App() {
                   <StatCard label="Lanai SF" value={fmt(area.lanai)} />
                   <StatCard label="Total Under Roof" value={fmt(area.total_under_roof)} />
                   <StatCard label="Rooms" value={fmt(rooms.length)} />
-                  <StatCard label="Ceiling Height" value={result.ceiling_height_ft ? `${result.ceiling_height_ft} ft` : "--"} />
+                  <StatCard label="Global Ceiling Height" value={result.ceiling_height_ft ? `${result.ceiling_height_ft} ft` : "--"} />
                 </div>
 
                 <Section title="Openings Summary">
@@ -355,13 +356,14 @@ export default function App() {
           <div style={{ marginTop: "24px", display: "grid", gap: "18px" }}>
             <Section title="Rooms">
               <SimpleTable
-                columns={["Room", "Length", "Width", "Interior SF", "SF Source", "Category", "Ref"]}
+                columns={["Room", "Length", "Width", "Interior SF", "SF Source", "Ceiling Note", "Category", "Ref"]}
                 rows={rooms.map((r) => [
                   r.name || "--",
                   r.length || "--",
                   r.width || "--",
                   fmt(r.sqft_interior),
                   r.sqft_source || "--",
+                  r.ceiling_note || "--",
                   r.category || "--",
                   r.ref || "--"
                 ])}
@@ -390,6 +392,25 @@ export default function App() {
                   r.size || "--",
                   r.location || "--",
                   fmt(r.qty),
+                  r.ref || "--"
+                ])}
+              />
+            </Section>
+
+            <Section title="Bathrooms">
+              <SimpleTable
+                columns={["Name", "Type", "Floor SF", "Floor Source", "Shower Floor SF", "Shower Source", "Shower Wall Tile SF", "Shower Wall Source", "Tub Tile SF", "Tub Tile Source", "Ref"]}
+                rows={bathrooms.map((r) => [
+                  r.name || "--",
+                  r.bath_type || "--",
+                  fmt(r.floor_sqft),
+                  r.floor_sqft_source || "--",
+                  fmt(r.shower_floor_sqft),
+                  r.shower_floor_source || "--",
+                  fmt(r.shower_wall_tile_sqft),
+                  r.shower_wall_tile_source || "--",
+                  fmt(r.tub_tile_sqft),
+                  r.tub_tile_source || "--",
                   r.ref || "--"
                 ])}
               />
